@@ -319,7 +319,10 @@
     requestAnimationFrame(frame);
   }
 
+  let introStarted = false;
   function startIntro() {
+    if (introStarted) return;
+    introStarted = true;
     addSoundButton();
     requestAnimationFrame(frame);
     /* Failsafe: always remove the intro even if the animation stalls. */
@@ -330,7 +333,23 @@
     }, DURATION + 5000);
   }
 
+  /* Phones and tablets have a coarse pointer. */
+  const isPhone = window.matchMedia("(pointer: coarse)").matches;
+
   function begin() {
+    /* Phones: always ask for a tap, so the sound is guaranteed to play. */
+    if (isPhone) {
+      showLamp(() => {
+        /* Start the smoke only once the audio really plays, so lightning stays in sync. */
+        audio.addEventListener("playing", startIntro, { once: true });
+        setTimeout(startIntro, 2500); // never wait forever
+        const p = audio.play();
+        if (p && p.catch) p.catch(startIntro);
+      });
+      return;
+    }
+
+    /* Laptop: try autoplay first, fall back to the lamp if blocked. */
     let p;
     try {
       p = audio.play();
@@ -393,7 +412,7 @@ const reactionVideoState = (function () {
   const ICON_OFF =
     '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M17 9l5 6M22 9l-5 6"/></svg>';
   let soundOn = true;
-  let current = null; // reaction layer currently shown
+  let current = null; // reaction layer currently shown (null when default is showing)
   function renderSound() {
     if (soundBtn) soundBtn.innerHTML = soundOn ? ICON_ON : ICON_OFF;
   }
@@ -407,38 +426,79 @@ const reactionVideoState = (function () {
     });
   }
 
-  /* Preloaded reaction layers, stacked on top of the default video */
+  /* Desktop: one preloaded layer per clip (instant playback, unchanged behaviour).
+     Phone: ONE shared layer plus background prefetch, because phones cannot
+     buffer or decode many <video> elements at once. */
+  const IS_PHONE = window.matchMedia("(pointer: coarse)").matches;
   const layers = {};
+  const cache = {}; // phone only: file -> blob URL
+  let sharedLayer = null;
+  let stallTimer = null;
 
-  Object.values(REACTIONS)
-    .flat()
-    .forEach((file) => {
-      const v = document.createElement("video");
-      v.className = "layer";
+  function makeLayer() {
+    const v = document.createElement("video");
+    v.className = "layer";
+    v.preload = "auto";
+    v.muted = true;
+    v.loop = false;
+    v.playsInline = true;
+    v.setAttribute("playsinline", "");
+    v.setAttribute("webkit-playsinline", "");
+    v.setAttribute("disablepictureinpicture", "");
+    v.addEventListener("ended", () => {
+      if (current === v) goToDefault();
+    });
+    v.addEventListener("error", () => {
+      if (current === v) goToDefault();
+    });
+    card.appendChild(v);
+    return v;
+  }
+
+  const allFiles = Object.values(REACTIONS).flat();
+
+  if (IS_PHONE) {
+    sharedLayer = makeLayer();
+
+    /* Download the clips one by one in the background, then play them from memory.
+       If a clip is not ready yet (or fetch fails), the direct URL is used instead. */
+    const prefetchAll = function () {
+      const c = navigator.connection;
+      if (c && c.saveData) return; // respect Data Saver
+      let i = 0;
+      (function next() {
+        if (i >= allFiles.length) return;
+        const file = allFiles[i++];
+        fetch(VIDEO_FOLDER + file)
+          .then((r) => (r.ok ? r.blob() : Promise.reject()))
+          .then((b) => {
+            cache[file] = URL.createObjectURL(b);
+          })
+          .catch(() => {})
+          .then(next);
+      })();
+    };
+    setTimeout(prefetchAll, 2000);
+  } else {
+    allFiles.forEach((file) => {
+      const v = makeLayer();
       v.src = VIDEO_FOLDER + file;
-      v.preload = "auto";
-      v.muted = true;
-      v.loop = false;
-      v.playsInline = true;
-      v.addEventListener("ended", () => {
-        if (current === v) goToDefault();
-      });
-      v.addEventListener("error", () => {
-        if (current === v) goToDefault();
-      });
-      card.appendChild(v);
       layers[file] = v;
     });
+  }
 
   function goToDefault() {
     stage = "default";
+    clearTimeout(stallTimer);
     if (current) {
       const old = current;
       current = null;
       old.classList.remove("on");
       setTimeout(() => {
-        old.pause();
-        old.currentTime = 0;
+        if (current !== old) {
+          old.pause();
+          if (!IS_PHONE) old.currentTime = 0;
+        }
       }, 200);
     }
     video.muted = true;
@@ -449,7 +509,7 @@ const reactionVideoState = (function () {
     const list = REACTIONS[videoKey];
     if (!list || !list.length) return goToDefault();
     const file = list[Math.floor(Math.random() * list.length)];
-    const v = layers[file];
+    const v = IS_PHONE ? sharedLayer : layers[file];
 
     if (current && current !== v) {
       current.pause();
@@ -458,7 +518,13 @@ const reactionVideoState = (function () {
     current = v;
     stage = "reaction";
     v.muted = !soundOn;
-    v.currentTime = 0;
+
+    if (IS_PHONE) {
+      v.classList.remove("on");
+      v.src = cache[file] || VIDEO_FOLDER + file;
+    } else {
+      v.currentTime = 0;
+    }
 
     /* Reveal the layer only once it is playing to avoid a blank frame. */
     v.addEventListener(
@@ -472,6 +538,30 @@ const reactionVideoState = (function () {
       v.muted = true;
       v.play().catch(() => {});
     });
+
+    /* Phone only: if it has not started within 6 s, fall back to the default loop. */
+    if (IS_PHONE) {
+      clearTimeout(stallTimer);
+      stallTimer = setTimeout(() => {
+        if (current === v && !v.classList.contains("on")) goToDefault();
+      }, 6000);
+    }
+  }
+
+  /* Phone only: keep the default loop alive (Low Power Mode, tab switches, etc.) */
+  if (IS_PHONE) {
+    video.setAttribute("playsinline", "");
+    video.setAttribute("webkit-playsinline", "");
+    const kick = function () {
+      if (stage === "default" && video.paused) video.play().catch(() => {});
+    };
+    video.addEventListener("pause", () => setTimeout(kick, 150));
+    document.addEventListener("visibilitychange", () => {
+      if (!document.hidden) kick();
+    });
+    ["pointerdown", "touchstart"].forEach((ev) =>
+      document.addEventListener(ev, kick, { passive: true }),
+    );
   }
 
   /* Drag support on small screens */
