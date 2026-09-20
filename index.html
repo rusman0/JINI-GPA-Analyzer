@@ -1,0 +1,358 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#ffffff" />
+    <title>JiniGPA Analyzer — SGPA &amp; CGPA Calculator</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%2340a6ff'/%3E%3Cstop offset='1' stop-color='%230b6fd0'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='15' fill='url(%23g)'/%3E%3Cg transform='translate(8 8)' fill='none' stroke='%23fff' stroke-width='2.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M24 15L38 21.5 24 28 10 21.5Z'/%3E%3Cpath d='M16 25v5.5c0 2 3.6 4 8 4s8-2 8-4V25'/%3E%3Cpath d='M38 21.5V29'/%3E%3C/g%3E%3C/svg%3E"
+    />
+    <script>
+      if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        document.documentElement.classList.add("intro-on");
+      }
+    </script>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="genie.css" />
+  </head>
+  <body>
+    <div class="flash-overlay" id="flashOverlay"></div>
+
+    <div class="shell">
+      <header>
+        <div class="brand-mark">
+          <div class="pendulum" aria-label="JiniGPA Analyzer">
+            <span class="pendulum-string"></span>
+            <div class="logo-box">
+              <svg
+                viewBox="0 0 48 48"
+                width="34"
+                height="34"
+                fill="none"
+                stroke="#ffffff"
+                stroke-width="2.4"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M24 15 L38 21.5 L24 28 L10 21.5 Z" />
+                <path d="M16 25v5.5c0 2 3.6 4 8 4s8-2 8-4V25" />
+                <path d="M38 21.5V29" />
+              </svg>
+            </div>
+          </div>
+          <div>
+            <h1>JiniGPA Analyzer</h1>
+            <p class="sub">
+              Enter your courses or semester results to calculate an accurate
+              SGPA or CGPA
+            </p>
+          </div>
+        </div>
+        <div class="mode-switch" id="modeSwitch">
+          <div class="switch-pill" id="switchPill"></div>
+          <button class="active" data-tab="sgpa">SGPA</button>
+          <button data-tab="cgpa">CGPA</button>
+        </div>
+      </header>
+
+      <main>
+        <div class="panels-wrap">
+          <div class="panel active" id="panel-sgpa">
+            <div class="input-card tilt-card">
+              <h2>Your courses</h2>
+              <p class="hint">
+                Add each course with its credit hours and the grade you
+                achieved.
+              </p>
+              <div class="quest-row">
+                <div class="quest-dots" id="questDotsSgpa"></div>
+                <span class="quest-label" id="questLabelSgpa"
+                  >0 courses added</span
+                >
+              </div>
+              <div class="col-labels">
+                <span>Course</span><span>Credits</span><span>Grade</span
+                ><span></span>
+              </div>
+              <div id="subjectRows"></div>
+              <button class="add-btn" id="addSubjectBtn">
+                <svg
+                  class="btn-ico"
+                  viewBox="0 0 20 20"
+                  width="16"
+                  height="16"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                >
+                  <path d="M10 4v12M4 10h12" />
+                </svg>
+                Add a course
+              </button>
+              <button class="calc-btn" id="calcSgpaBtn">
+                <span>Reveal my SGPA</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="panel" id="panel-cgpa">
+            <div class="input-card tilt-card">
+              <h2>Your semesters</h2>
+              <p class="hint">
+                Add every completed semester with its SGPA and total credit
+                hours.
+              </p>
+              <div class="quest-row">
+                <div class="quest-dots" id="questDotsCgpa"></div>
+                <span class="quest-label" id="questLabelCgpa"
+                  >0 semesters added</span
+                >
+              </div>
+              <div class="col-labels">
+                <span>Semester</span><span>SGPA</span><span>Credits</span
+                ><span></span>
+              </div>
+              <div id="semRows"></div>
+              <button class="add-btn" id="addSemBtn">
+                <svg
+                  class="btn-ico"
+                  viewBox="0 0 20 20"
+                  width="16"
+                  height="16"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                >
+                  <path d="M10 4v12M4 10h12" />
+                </svg>
+                Add a semester
+              </button>
+              <button class="calc-btn" id="calcCgpaBtn">
+                <span>Reveal my CGPA</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="side-col">
+          <div class="video-card" id="videoCard">
+            <div class="video-drag-handle" id="videoDragHandle">⠿</div>
+            <button
+              class="video-sound"
+              id="videoSoundBtn"
+              type="button"
+              aria-label="Video sound on/off"
+            ></button>
+            <video
+              id="reactionVideo"
+              src="Videos/Default.mp4"
+              muted
+              loop
+              autoplay
+              playsinline
+              preload="auto"
+            ></video>
+          </div>
+
+          <div class="result-panel tilt-card" id="resultPanel">
+            <div class="placeholder" id="placeholderState">
+              <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
+                <circle
+                  cx="32"
+                  cy="32"
+                  r="31"
+                  stroke="#9fcbf5"
+                  stroke-width="1"
+                />
+                <g
+                  stroke="#1587f0"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <circle
+                    cx="30"
+                    cy="14"
+                    r="2.2"
+                    fill="#ffc83d"
+                    stroke="none"
+                  />
+                  <path d="M23 24 Q23 18 30 18 Q37 18 37 24" />
+                  <path d="M20 24 H40" />
+                  <path
+                    d="M13 28 H47 Q47 43 30 43 Q13 43 13 28 Z"
+                    fill="#e6f3ff"
+                  />
+                  <path d="M14 31 Q7 30 5.5 21" />
+                  <path d="M47 30 Q57 30 55.5 37.5 Q54 42 46 38.5" />
+                  <path d="M25 43 L24 47 H36 L35 43" />
+                  <path d="M21 47 H39" />
+                </g>
+                <path
+                  d="M17 34 Q30 39 43 34"
+                  stroke="#ffc83d"
+                  stroke-width="1.6"
+                  stroke-linecap="round"
+                />
+              </svg>
+              <div>
+                Rub the lamp: calculate a result and your genie will appear
+                here.
+              </div>
+            </div>
+
+            <div class="result-body" id="resultBody">
+              <div class="badge-stage" id="badgeStage">
+                <div class="sparkle-field" id="sparkleField"></div>
+                <div class="mascot-wrap" id="mascotWrap">
+                  <svg
+                    width="112"
+                    height="130"
+                    viewBox="0 -8 120 140"
+                    fill="none"
+                  >
+                    <defs>
+                      <radialGradient id="genieSkin" cx="35%" cy="28%" r="80%">
+                        <stop offset="0%" stop-color="#9fd2ff" />
+                        <stop offset="55%" stop-color="#40a6ff" />
+                        <stop offset="100%" stop-color="#0b6fd0" />
+                      </radialGradient>
+                      <linearGradient
+                        id="genieTail"
+                        x1="0"
+                        y1="0"
+                        x2="0"
+                        y2="1"
+                      >
+                        <stop offset="0%" stop-color="#1587f0" />
+                        <stop
+                          offset="100%"
+                          stop-color="#1587f0"
+                          stop-opacity="0"
+                        />
+                      </linearGradient>
+                      <filter
+                        id="softShadow"
+                        x="-50%"
+                        y="-50%"
+                        width="200%"
+                        height="200%"
+                      >
+                        <feDropShadow
+                          dx="0"
+                          dy="3"
+                          stdDeviation="3"
+                          flood-color="#0b1b33"
+                          flood-opacity="0.16"
+                        />
+                      </filter>
+                    </defs>
+                    <path
+                      d="M34 80 C28 100 48 104 52 114 C54 122 46 126 38 128 C62 132 76 120 68 108 C64 100 90 98 86 80 Z"
+                      fill="url(#genieTail)"
+                    />
+                    <path
+                      d="M30 84 Q60 104 90 84 L86 98 Q60 114 34 98 Z"
+                      fill="#1587f0"
+                    />
+                    <circle cx="33" cy="92" r="6" fill="#ffc83d" />
+                    <circle cx="87" cy="92" r="6" fill="#ffc83d" />
+                    <ellipse cx="29" cy="54" rx="5" ry="7" fill="#40a6ff" />
+                    <ellipse cx="91" cy="54" rx="5" ry="7" fill="#40a6ff" />
+                    <circle
+                      cx="27"
+                      cy="65"
+                      r="3.5"
+                      stroke="#ffc83d"
+                      stroke-width="2"
+                    />
+                    <circle
+                      cx="93"
+                      cy="65"
+                      r="3.5"
+                      stroke="#ffc83d"
+                      stroke-width="2"
+                    />
+                    <circle
+                      cx="60"
+                      cy="52"
+                      r="31"
+                      fill="url(#genieSkin)"
+                      filter="url(#softShadow)"
+                    />
+                    <path
+                      d="M53 78 Q60 98 67 78 Q60 82 53 78 Z"
+                      fill="#0b1b33"
+                    />
+                    <g id="mascotBrows"></g>
+                    <g id="mascotEyes"></g>
+                    <path
+                      id="mascotMouth"
+                      d="M46 67 Q60 76 74 67"
+                      stroke="#0b1b33"
+                      stroke-width="2.8"
+                      fill="none"
+                      stroke-linecap="round"
+                    />
+                    <g id="mascotAccessoryFront"></g>
+                    <g id="mascotCap">
+                      <path d="M60 6 L96 24 L60 42 L24 24 Z" fill="#0b1b33" />
+                      <path
+                        d="M38 27.5v10c0 4 9.8 8 22 8s22-4 22-8v-10L60 37.5Z"
+                        fill="#14213d"
+                      />
+                      <path
+                        d="M96 24v13"
+                        stroke="#0b1b33"
+                        stroke-width="2.2"
+                        stroke-linecap="round"
+                      />
+                      <circle cx="96" cy="39" r="2.6" fill="#ffc83d" />
+                      <circle cx="60" cy="24" r="2.2" fill="#ffc83d" />
+                    </g>
+                  </svg>
+                </div>
+              </div>
+
+              <div class="level-tag" id="levelTag">Level 1</div>
+              <div class="result-label" id="resultLabel">Your SGPA</div>
+              <div class="result-number" id="resultNumber">0.00</div>
+              <span class="result-tier-tag" id="resultTag">Tier</span>
+              <div class="result-msg" id="resultMsg"></div>
+
+              <div class="xp-bar">
+                <div class="xp-labels">
+                  <span>Progress</span><span id="xpRightLabel">0%</span>
+                </div>
+                <div class="track">
+                  <div class="fill" id="scaleFill">
+                    <div class="fill-spark"></div>
+                  </div>
+                </div>
+                <div class="marks">
+                  <span>0.0</span><span>2.0</span><span>4.0</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <footer>
+        <p>
+          Standard 4.0 grading scale · Results are calculated locally in your
+          browser.
+        </p>
+        <p class="credit">Made By Raja Usman Zafar</p>
+      </footer>
+    </div>
+
+    <canvas class="smoke-canvas" id="smokeCanvas" aria-hidden="true"></canvas>
+    <script src="script.js"></script>
+  </body>
+</html>
