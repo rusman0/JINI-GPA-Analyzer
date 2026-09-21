@@ -1,0 +1,224 @@
+/* Guide, grade scale and FAQ sections.
+   Load after genie.css so it can use the colour tokens defined there. */
+
+.info {
+  margin-top: 64px;
+  padding-top: 44px;
+  border-top: 1px solid var(--line);
+}
+.info h2 {
+  font-family: "Fraunces", serif;
+  font-weight: 600;
+  font-size: 1.9rem;
+  line-height: 1.2;
+  margin: 0 0 14px;
+  color: var(--gold-hi);
+}
+.info h3 {
+  font-family: "Fraunces", serif;
+  font-weight: 600;
+  font-size: 1.2rem;
+  margin: 34px 0 10px;
+  color: var(--gold);
+}
+.info p {
+  max-width: 68ch;
+  margin: 0 0 14px;
+  line-height: 1.7;
+  color: var(--ink-soft);
+}
+.info strong {
+  color: var(--ink);
+}
+
+/* Two columns: SGPA and CGPA side by side */
+.info-cols {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 44px;
+  margin-top: 8px;
+}
+.info-cols h3 {
+  margin-top: 22px;
+}
+
+.formula {
+  font-family: "Fraunces", serif;
+  font-size: 1.05rem;
+  line-height: 1.5;
+  color: var(--gold-hi);
+  padding: 14px 18px;
+  margin: 0 0 20px;
+  background: var(--field);
+  border-left: 3px solid var(--gold);
+  border-radius: 0 8px 8px 0;
+}
+.info .formula {
+  color: var(--gold-hi);
+}
+
+/* Steps: a real sequence, so numbering is meaningful */
+.steps {
+  list-style: none;
+  counter-reset: step;
+  margin: 0;
+  padding: 0;
+}
+.steps li {
+  counter-increment: step;
+  position: relative;
+  padding-left: 42px;
+  margin-bottom: 14px;
+  line-height: 1.6;
+  color: var(--ink);
+}
+.steps li::before {
+  content: counter(step);
+  position: absolute;
+  left: 0;
+  top: -1px;
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  border: 1.5px solid var(--gold);
+  border-radius: 50%;
+  color: var(--gold);
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+/* Tables */
+.table-wrap {
+  overflow-x: auto;
+  margin: 0 0 16px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: rgba(9, 14, 50, 0.55);
+}
+.info table {
+  width: 100%;
+  min-width: 460px;
+  border-collapse: collapse;
+  font-size: 0.94rem;
+  font-variant-numeric: tabular-nums;
+}
+.info caption {
+  caption-side: top;
+  text-align: left;
+  padding: 14px 16px 4px;
+  font-size: 0.88rem;
+  color: var(--ink-soft);
+}
+.info th,
+.info td {
+  padding: 12px 16px;
+  text-align: left;
+  border-bottom: 1px solid rgba(245, 192, 74, 0.14);
+}
+.info th {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--gold);
+  border-bottom-color: var(--line);
+}
+.info td {
+  color: var(--ink);
+}
+.info .num {
+  text-align: right;
+}
+.info tbody tr:last-child td {
+  border-bottom: none;
+}
+.info tfoot td {
+  font-weight: 700;
+  color: var(--gold-hi);
+  border-top: 1px solid var(--line);
+  border-bottom: none;
+}
+
+/* Grade scale chips */
+.grade-grid {
+  list-style: none;
+  margin: 8px 0 26px;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(112px, 1fr));
+  gap: 10px;
+}
+.grade-grid li {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--field);
+}
+.grade-grid b {
+  color: var(--gold-hi);
+}
+.grade-grid span {
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.info .note {
+  font-size: 0.86rem;
+  margin-top: 18px;
+}
+
+/* FAQ */
+.info details {
+  border-bottom: 1px solid var(--line);
+  max-width: 760px;
+}
+.info summary {
+  position: relative;
+  cursor: pointer;
+  list-style: none;
+  padding: 18px 36px 18px 0;
+  font-weight: 600;
+  color: var(--ink);
+}
+.info summary::-webkit-details-marker {
+  display: none;
+}
+.info summary::after {
+  content: "+";
+  position: absolute;
+  right: 4px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1.4rem;
+  font-weight: 400;
+  color: var(--gold);
+}
+.info details[open] summary::after {
+  content: "\2212";
+}
+.info summary:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+.info details p {
+  margin: 0 0 18px;
+}
+
+@media (max-width: 800px) {
+  .info-cols {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+}
+@media (max-width: 520px) {
+  .info {
+    margin-top: 48px;
+    padding-top: 34px;
+  }
+  .info h2 {
+    font-size: 1.55rem;
+  }
+}
