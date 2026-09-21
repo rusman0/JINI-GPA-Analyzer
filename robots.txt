@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://jini-gpa-analyzer.netlify.app/sitemap.xml
+Sitemap: https://jini-gpa-analyzer.vercel.app/sitemap.xml
