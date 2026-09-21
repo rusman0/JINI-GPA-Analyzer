@@ -391,8 +391,8 @@ const reactionVideoState = (function () {
   const handle = document.getElementById("videoDragHandle");
   if (!video || !card) return {};
 
-  const VIDEO_FOLDER = "Videos/";
-  const DEFAULT_SRC = VIDEO_FOLDER + "Default.mp4";
+const VIDEO_FOLDER = "videos/";
+const DEFAULT_SRC = VIDEO_FOLDER + "Default.mp4";
   let stage = "default"; // "default" | "reaction"
 
   /* Reaction clips per tier (minimum GPA in comments) */
