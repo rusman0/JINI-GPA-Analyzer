@@ -3,19 +3,66 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#ffffff" />
-    <title>JiniGPA Analyzer — SGPA &amp; CGPA Calculator</title>
+    <title>JiniGPA Analyzer — Free SGPA &amp; CGPA Calculator (4.0 Scale)</title>
+    <meta
+      name="description"
+      content="Free SGPA and CGPA calculator on the 4.0 scale. Add your courses, credit hours and grades to get your GPA instantly, with formulas and worked examples."
+    />
+    <meta name="theme-color" content="#070b24" />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+    <link rel="canonical" href="https://jini-gpa-analyzer.vercel.app/" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="JiniGPA Analyzer — Free SGPA &amp; CGPA Calculator" />
+    <meta
+      property="og:description"
+      content="Calculate your SGPA and CGPA on the 4.0 scale, with step-by-step formulas."
+    />
+    <meta property="og:url" content="https://jini-gpa-analyzer.vercel.app/" />
+    <meta property="og:image" content="https://jini-gpa-analyzer.vercel.app/lamp.png" />
+    <meta name="twitter:card" content="summary" />
+
     <link
       rel="icon"
       href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%2340a6ff'/%3E%3Cstop offset='1' stop-color='%230b6fd0'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='15' fill='url(%23g)'/%3E%3Cg transform='translate(8 8)' fill='none' stroke='%23fff' stroke-width='2.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M24 15L38 21.5 24 28 10 21.5Z'/%3E%3Cpath d='M16 25v5.5c0 2 3.6 4 8 4s8-2 8-4V25'/%3E%3Cpath d='M38 21.5V29'/%3E%3C/g%3E%3C/svg%3E"
     />
-    <script>
-      if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-        document.documentElement.classList.add("intro-on");
+
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "JiniGPA Analyzer",
+        "url": "https://jini-gpa-analyzer.vercel.app/",
+        "applicationCategory": "EducationalApplication",
+        "operatingSystem": "Any",
+        "description": "Free SGPA and CGPA calculator on the 4.0 scale.",
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
       }
     </script>
+
+    <script>
+      (function () {
+        var reduce = window.matchMedia(
+          "(prefers-reduced-motion: reduce)",
+        ).matches;
+        var bot = /bot|crawl|spider|lighthouse|headless/i.test(
+          navigator.userAgent,
+        );
+        if (!reduce && !bot) {
+          document.documentElement.classList.add("intro-on");
+        }
+      })();
+    </script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&amp;family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&amp;family=IBM+Plex+Sans:wght@400;500;600;700&amp;display=swap"
+    />
     <link rel="stylesheet" href="style.css" />
     <link rel="stylesheet" href="genie.css" />
+    <link rel="stylesheet" href="content.css" />
   </head>
   <body>
     <div class="flash-overlay" id="flashOverlay"></div>
@@ -148,15 +195,15 @@
               type="button"
               aria-label="Video sound on/off"
             ></button>
-<video
-  id="reactionVideo"
-  src="videos/Default.mp4"
-  muted
-  loop
-  autoplay
-  playsinline
-  preload="auto"
-></video>
+            <video
+              id="reactionVideo"
+              src="videos/Default.mp4"
+              muted
+              loop
+              autoplay
+              playsinline
+              preload="auto"
+            ></video>
           </div>
 
           <div class="result-panel tilt-card" id="resultPanel">
@@ -342,6 +389,294 @@
           </div>
         </div>
       </main>
+
+      <!-- ============ Guide, grade scale and FAQ ============ -->
+
+      <section class="info" id="how-to-calculate" aria-labelledby="guide-title">
+        <h2 id="guide-title">How to calculate your GPA</h2>
+        <p>
+          Every course carries a number of credit hours, and every grade maps to
+          grade points on the 4.0 scale. A course with more credit hours pulls
+          your GPA harder, which is why a plain average of your grades is not
+          the same as your GPA. The calculator above does the arithmetic for
+          you; this is what happens behind the button.
+        </p>
+
+        <div class="info-cols">
+          <div>
+            <h3>SGPA: one semester</h3>
+            <p>
+              SGPA (Semester Grade Point Average) is the credit-weighted average
+              of the grades in a single semester.
+            </p>
+            <p class="formula">
+              SGPA = &Sigma;(credit hours &times; grade points) &divide;
+              &Sigma;(credit hours)
+            </p>
+            <ol class="steps">
+              <li>
+                Multiply each course's credit hours by its grade points. The
+                result is the quality points for that course.
+              </li>
+              <li>Add up the quality points of all courses.</li>
+              <li>Add up the credit hours of all courses.</li>
+              <li>Divide total quality points by total credit hours.</li>
+            </ol>
+          </div>
+
+          <div>
+            <h3>CGPA: all semesters</h3>
+            <p>
+              CGPA (Cumulative Grade Point Average) combines every completed
+              semester. Each SGPA is weighted by the credit hours of its
+              semester.
+            </p>
+            <p class="formula">
+              CGPA = &Sigma;(SGPA &times; semester credits) &divide;
+              &Sigma;(semester credits)
+            </p>
+            <ol class="steps">
+              <li>Multiply each semester's SGPA by its total credit hours.</li>
+              <li>Add up these results for all semesters.</li>
+              <li>Add up the credit hours of all semesters.</li>
+              <li>Divide the first total by the second.</li>
+            </ol>
+          </div>
+        </div>
+
+        <h3>Worked example: SGPA</h3>
+        <div class="table-wrap">
+          <table>
+            <caption>
+              Four courses in one semester
+            </caption>
+            <thead>
+              <tr>
+                <th scope="col">Course</th>
+                <th scope="col" class="num">Credits</th>
+                <th scope="col">Grade</th>
+                <th scope="col" class="num">Grade points</th>
+                <th scope="col" class="num">Quality points</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Calculus I</td>
+                <td class="num">3</td>
+                <td>A</td>
+                <td class="num">4.00</td>
+                <td class="num">12.00</td>
+              </tr>
+              <tr>
+                <td>Physics</td>
+                <td class="num">4</td>
+                <td>B+</td>
+                <td class="num">3.33</td>
+                <td class="num">13.32</td>
+              </tr>
+              <tr>
+                <td>Programming</td>
+                <td class="num">3</td>
+                <td>A-</td>
+                <td class="num">3.67</td>
+                <td class="num">11.01</td>
+              </tr>
+              <tr>
+                <td>English</td>
+                <td class="num">2</td>
+                <td>B</td>
+                <td class="num">3.00</td>
+                <td class="num">6.00</td>
+              </tr>
+            </tbody>
+            <tfoot>
+              <tr>
+                <td>Total</td>
+                <td class="num">12</td>
+                <td></td>
+                <td></td>
+                <td class="num">42.33</td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+        <p>
+          SGPA = 42.33 &divide; 12 = 3.5275, which rounds to
+          <strong>3.53</strong>.
+        </p>
+
+        <h3>Worked example: CGPA</h3>
+        <div class="table-wrap">
+          <table>
+            <caption>
+              Two completed semesters
+            </caption>
+            <thead>
+              <tr>
+                <th scope="col">Semester</th>
+                <th scope="col" class="num">SGPA</th>
+                <th scope="col" class="num">Credits</th>
+                <th scope="col" class="num">SGPA &times; credits</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Semester 1</td>
+                <td class="num">3.40</td>
+                <td class="num">18</td>
+                <td class="num">61.20</td>
+              </tr>
+              <tr>
+                <td>Semester 2</td>
+                <td class="num">3.70</td>
+                <td class="num">15</td>
+                <td class="num">55.50</td>
+              </tr>
+            </tbody>
+            <tfoot>
+              <tr>
+                <td>Total</td>
+                <td></td>
+                <td class="num">33</td>
+                <td class="num">116.70</td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+        <p>
+          CGPA = 116.70 &divide; 33 = 3.5364, which rounds to
+          <strong>3.54</strong>. Notice that this is not the plain average of
+          3.40 and 3.70 (3.55), because Semester 1 had more credit hours.
+        </p>
+      </section>
+
+      <section class="info" id="grade-scale" aria-labelledby="scale-title">
+        <h2 id="scale-title">Grade scale and what your GPA means</h2>
+        <p>
+          JiniGPA Analyzer uses the standard 4.0 scale with plus and minus
+          grades.
+        </p>
+        <ul class="grade-grid">
+          <li><b>A+</b><span>4.00</span></li>
+          <li><b>A</b><span>4.00</span></li>
+          <li><b>A-</b><span>3.67</span></li>
+          <li><b>B+</b><span>3.33</span></li>
+          <li><b>B</b><span>3.00</span></li>
+          <li><b>B-</b><span>2.67</span></li>
+          <li><b>C+</b><span>2.33</span></li>
+          <li><b>C</b><span>2.00</span></li>
+          <li><b>C-</b><span>1.67</span></li>
+          <li><b>D+</b><span>1.33</span></li>
+          <li><b>D</b><span>1.00</span></li>
+          <li><b>F</b><span>0.00</span></li>
+        </ul>
+
+        <div class="table-wrap">
+          <table>
+            <caption>
+              Performance levels used by the calculator
+            </caption>
+            <thead>
+              <tr>
+                <th scope="col">GPA range</th>
+                <th scope="col">Level</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>3.80 to 4.00</td>
+                <td>Excellent</td>
+              </tr>
+              <tr>
+                <td>3.50 to 3.79</td>
+                <td>Very Good</td>
+              </tr>
+              <tr>
+                <td>3.00 to 3.49</td>
+                <td>Good</td>
+              </tr>
+              <tr>
+                <td>2.50 to 2.99</td>
+                <td>Average</td>
+              </tr>
+              <tr>
+                <td>2.00 to 2.49</td>
+                <td>Fair</td>
+              </tr>
+              <tr>
+                <td>Below 2.00</td>
+                <td>Needs improvement</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="note">
+          Universities set their own grade values and cut-offs. If your handbook
+          uses different numbers, your official GPA can differ slightly from the
+          result here.
+        </p>
+      </section>
+
+      <section class="info" id="faq" aria-labelledby="faq-title">
+        <h2 id="faq-title">Frequently asked questions</h2>
+
+        <details>
+          <summary>What is the difference between SGPA and CGPA?</summary>
+          <p>
+            SGPA covers one semester. CGPA covers every semester you have
+            completed, with each semester weighted by its credit hours. Use the
+            SGPA tab for a single semester's courses and the CGPA tab to combine
+            semester results.
+          </p>
+        </details>
+
+        <details>
+          <summary>What is considered a good GPA?</summary>
+          <p>
+            It depends on your program and goals. On a 4.0 scale, 3.0 is
+            generally a solid pass level, 3.5 and above is strong, and
+            scholarships or graduate programs often set their own minimum. Check
+            the requirement of the specific program you are aiming for.
+          </p>
+        </details>
+
+        <details>
+          <summary>Will this match my university's official GPA?</summary>
+          <p>
+            It will if your university uses the same 4.0 scale shown above. Some
+            universities use slightly different grade values or round
+            differently, so treat the result as an accurate estimate and confirm
+            it against your transcript.
+          </p>
+        </details>
+
+        <details>
+          <summary>Why do credit hours matter?</summary>
+          <p>
+            A 4-credit course counts more than a 2-credit course. Weighting by
+            credit hours makes sure your GPA reflects how much work each course
+            represents.
+          </p>
+        </details>
+
+        <details>
+          <summary>How do I handle a repeated course?</summary>
+          <p>
+            Policies differ: some universities replace the old grade with the
+            new one, others average both. Follow your university's rule, or
+            enter the SGPA and credit values exactly as they appear on your
+            transcript in the CGPA tab.
+          </p>
+        </details>
+
+        <details>
+          <summary>Are my grades saved or uploaded anywhere?</summary>
+          <p>
+            No. The calculation runs in your browser, and the courses and grades
+            you type are not sent to a server.
+          </p>
+        </details>
+      </section>
 
       <footer>
         <p>
