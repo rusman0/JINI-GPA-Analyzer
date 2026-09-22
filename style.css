@@ -905,6 +905,7 @@ footer .credit::after {
   align-items: center;
   justify-content: center;
   gap: 18px;
+  background: #ffffff;
   transition: opacity 0.7s ease;
 }
 .intro-gate.hide {
