@@ -33,16 +33,6 @@ select:focus-visible {
 .intro-on .smoke-canvas {
   background: #ffffff;
 }
-/* NEW: lock page scrolling while the lamp-gate / smoke intro is on screen.
-   The intro overlay is position:fixed, so without this the page behind it
-   could still be scrolled, leaving the lamp visually "stuck" in place while
-   the rest of the site moved underneath it. */
-html.intro-on,
-html.intro-on body {
-  overflow: hidden;
-  height: 100%;
-  touch-action: none;
-}
 .smoke-canvas {
   position: fixed;
   inset: 0;
@@ -54,31 +44,6 @@ html.intro-on body {
 }
 .smoke-canvas.fade-out {
   opacity: 0;
-}
-
-/* Keeps the very top (notch / status-bar) and bottom (home-indicator) safe-area
-   strips solid white for the whole lamp / smoke intro, so the real (dark)
-   theme never peeks through early there and creates a mismatched seam.
-   Hidden automatically once the intro finishes (intro-on is removed). */
-.safe-cap {
-  position: fixed;
-  left: 0;
-  right: 0;
-  background: #ffffff;
-  z-index: 901;
-  display: none;
-  pointer-events: none;
-}
-.safe-cap-top {
-  top: 0;
-  height: env(safe-area-inset-top, 0px);
-}
-.safe-cap-bottom {
-  bottom: 0;
-  height: env(safe-area-inset-bottom, 0px);
-}
-html.intro-on .safe-cap {
-  display: block;
 }
 
 /* Layout and header */
@@ -930,7 +895,6 @@ footer .credit::after {
   align-items: center;
   justify-content: center;
   gap: 18px;
-  background: #ffffff;
   transition: opacity 0.7s ease;
 }
 .intro-gate.hide {
