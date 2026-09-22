@@ -56,6 +56,31 @@ html.intro-on body {
   opacity: 0;
 }
 
+/* Keeps the very top (notch / status-bar) and bottom (home-indicator) safe-area
+   strips solid white for the whole lamp / smoke intro, so the real (dark)
+   theme never peeks through early there and creates a mismatched seam.
+   Hidden automatically once the intro finishes (intro-on is removed). */
+.safe-cap {
+  position: fixed;
+  left: 0;
+  right: 0;
+  background: #ffffff;
+  z-index: 901;
+  display: none;
+  pointer-events: none;
+}
+.safe-cap-top {
+  top: 0;
+  height: env(safe-area-inset-top, 0px);
+}
+.safe-cap-bottom {
+  bottom: 0;
+  height: env(safe-area-inset-bottom, 0px);
+}
+html.intro-on .safe-cap {
+  display: block;
+}
+
 /* Layout and header */
 .shell {
   position: relative;
