@@ -1,6 +1,6 @@
 /* Structure, layout and animations.
-   Colours and decoration (including colour tokens) live in genie.css.
-   Fonts are loaded from index.html. */
+   Colours and decoration (including colour tokens) live in genie.css. */
+@import url("https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap");
 
 * {
   box-sizing: border-box;
@@ -32,6 +32,16 @@ select:focus-visible {
 /* Smoke intro */
 .intro-on .smoke-canvas {
   background: #ffffff;
+}
+/* NEW: lock page scrolling while the lamp-gate / smoke intro is on screen.
+   The intro overlay is position:fixed, so without this the page behind it
+   could still be scrolled, leaving the lamp visually "stuck" in place while
+   the rest of the site moved underneath it. */
+html.intro-on,
+html.intro-on body {
+  overflow: hidden;
+  height: 100%;
+  touch-action: none;
 }
 .smoke-canvas {
   position: fixed;
