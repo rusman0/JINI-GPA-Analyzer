@@ -6,19 +6,21 @@
   const canvas = document.getElementById("smokeCanvas");
   const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
+  function blockTouch(e) {
+    if (root.classList.contains("intro-on")) {
+      e.preventDefault();
+    }
+  }
+  document.addEventListener("touchmove", blockTouch, { passive: false });
+
   let finished = false;
   function finish() {
     if (finished) return;
     finished = true;
     root.classList.remove("intro-on");
+    document.removeEventListener("touchmove", blockTouch);
   }
-  /* Skip the intro when reduced motion is on, or for bots (no intro-on class). */
-  if (
-    !canvas ||
-    !canvas.getContext ||
-    reduce ||
-    !root.classList.contains("intro-on")
-  ) {
+  if (!canvas || !canvas.getContext || reduce) {
     finish();
     if (canvas) canvas.remove();
     return;
@@ -397,7 +399,7 @@ const reactionVideoState = (function () {
   const handle = document.getElementById("videoDragHandle");
   if (!video || !card) return {};
 
-  const VIDEO_FOLDER = "videos/";
+  const VIDEO_FOLDER = "Videos/";
   const DEFAULT_SRC = VIDEO_FOLDER + "Default.mp4";
   let stage = "default"; // "default" | "reaction"
 
@@ -827,10 +829,10 @@ function addSubjectRow() {
   const row = document.createElement("div");
   row.className = "subject-row";
   row.innerHTML = `
-    <input type="text" placeholder="e.g. Calculus I" class="subj-name" aria-label="Course name">
-    <input type="number" min="0" step="0.5" placeholder="3" class="subj-credit" aria-label="Credit hours">
-    <select class="subj-grade" aria-label="Grade">${gradeOptions()}</select>
-    <button class="remove-btn" title="Vanish" aria-label="Remove course">&#10005;</button>
+    <input type="text" placeholder="e.g. Calculus I" class="subj-name">
+    <input type="number" min="0" step="0.5" placeholder="3" class="subj-credit">
+    <select class="subj-grade">${gradeOptions()}</select>
+    <button class="remove-btn" title="Vanish">&#10005;</button>
   `;
   row.querySelector(".remove-btn").addEventListener("click", () => {
     row.classList.add("row-leave");
@@ -861,10 +863,10 @@ function addSemRow(defaultName) {
   const row = document.createElement("div");
   row.className = "sem-row";
   row.innerHTML = `
-    <input type="text" placeholder="e.g. Semester 1" class="sem-name" value="${defaultName || ""}" aria-label="Semester name">
-    <input type="number" min="0" max="4" step="0.01" placeholder="3.50" class="sem-sgpa" aria-label="Semester SGPA">
-    <input type="number" min="0" step="0.5" placeholder="18" class="sem-credit" aria-label="Semester credit hours">
-    <button class="remove-btn" title="Vanish" aria-label="Remove semester">&#10005;</button>
+    <input type="text" placeholder="e.g. Semester 1" class="sem-name" value="${defaultName || ""}">
+    <input type="number" min="0" max="4" step="0.01" placeholder="3.50" class="sem-sgpa">
+    <input type="number" min="0" step="0.5" placeholder="18" class="sem-credit">
+    <button class="remove-btn" title="Vanish">&#10005;</button>
   `;
   row.querySelector(".remove-btn").addEventListener("click", () => {
     row.classList.add("row-leave");
@@ -905,14 +907,7 @@ document.getElementById("calcCgpaBtn").addEventListener("click", () => {
   semRows.querySelectorAll(".sem-row").forEach((row) => {
     const sgpa = parseFloat(row.querySelector(".sem-sgpa").value);
     const credit = parseFloat(row.querySelector(".sem-credit").value);
-    /* SGPA must be between 0 and 4, otherwise the row is ignored. */
-    if (
-      !isNaN(sgpa) &&
-      sgpa >= 0 &&
-      sgpa <= 4 &&
-      !isNaN(credit) &&
-      credit > 0
-    ) {
+    if (!isNaN(sgpa) && !isNaN(credit) && credit > 0) {
       points += sgpa * credit;
       credits += credit;
     }
