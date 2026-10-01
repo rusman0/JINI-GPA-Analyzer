@@ -28,7 +28,7 @@
       property="og:image"
       content="https://jini-gpa-analyzer.vercel.app/lamp.png"
     />
-    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:card" content="summary_large_image" />
 
     <link
       rel="icon"
@@ -56,8 +56,15 @@
         var bot = /bot|crawl|spider|lighthouse|headless/i.test(
           navigator.userAgent,
         );
-        if (!reduce && !bot) {
+        var seen = false;
+        try {
+          seen = sessionStorage.getItem("jini-intro") === "1";
+        } catch (e) {}
+        if (!reduce && !bot && !seen) {
           document.documentElement.classList.add("intro-on");
+          try {
+            sessionStorage.setItem("jini-intro", "1");
+          } catch (e) {}
         }
       })();
     </script>
@@ -397,8 +404,6 @@
           </div>
         </div>
       </main>
-
-      <!-- ============ Guide, grade scale and FAQ ============ -->
 
       <section class="info" id="how-to-calculate" aria-labelledby="guide-title">
         <h2 id="guide-title">How to calculate your GPA</h2>
