@@ -1,7 +1,3 @@
-/* Structure, layout and animations.
-   Colours and decoration (including colour tokens) live in genie.css. */
-@import url("https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap");
-
 * {
   box-sizing: border-box;
 }
@@ -16,7 +12,6 @@ html {
   background: var(--bg);
   overflow-x: hidden;
 }
-/* Only html clips the x-axis; if body clipped too it would become its own scroller. */
 body {
   min-height: 100vh;
   overflow-x: visible;
@@ -29,7 +24,6 @@ select:focus-visible {
   outline-offset: 2px;
 }
 
-/* Smoke intro */
 .intro-on .smoke-canvas {
   background: #ffffff;
 }
@@ -46,7 +40,6 @@ select:focus-visible {
   opacity: 0;
 }
 
-/* Layout and header */
 .shell {
   position: relative;
   z-index: 1;
@@ -96,7 +89,6 @@ header .sub {
   max-width: 420px;
 }
 
-/* Mode switch */
 .mode-switch {
   position: relative;
   display: flex;
@@ -143,7 +135,6 @@ main {
   margin-top: 32px;
   align-items: start;
 }
-/* Padding leaves room so shadows are not clipped while the card tilts. */
 .panels-wrap {
   position: relative;
   overflow: hidden;
@@ -158,7 +149,6 @@ main {
   display: block;
 }
 
-/* Panel transition */
 @keyframes disassembleDown {
   0% {
     opacity: 1;
@@ -240,7 +230,6 @@ main {
   }
 }
 
-/* Course counter dots */
 .quest-row {
   display: flex;
   align-items: center;
@@ -274,7 +263,6 @@ main {
   font-weight: 600;
 }
 
-/* Rows and inputs */
 .col-labels,
 .subject-row,
 .sem-row {
@@ -367,7 +355,6 @@ select:focus {
   transform: rotate(180deg) scale(1.15);
 }
 
-/* Buttons */
 .add-btn,
 .calc-btn {
   position: relative;
@@ -511,7 +498,6 @@ select:focus {
   }
 }
 
-/* Result panel */
 .result-panel {
   text-align: center;
   position: relative;
@@ -704,7 +690,6 @@ select:focus {
   margin: 0 auto;
 }
 
-/* Progress bar */
 .xp-bar {
   margin-top: 22px;
   text-align: left;
@@ -787,7 +772,6 @@ select:focus {
   margin-top: 5px;
 }
 
-/* Particles */
 .particle {
   position: absolute;
   top: 40%;
@@ -825,7 +809,6 @@ select:focus {
   }
 }
 
-/* Footer */
 footer {
   position: relative;
   padding-top: 30px;
@@ -851,7 +834,6 @@ footer .credit::after {
   margin: 0 10px;
 }
 
-/* Sound button, flash overlay and lamp gate */
 .sound-btn {
   position: fixed;
   right: 18px;
@@ -1011,7 +993,6 @@ footer .credit::after {
     sans-serif;
 }
 
-/* Reaction video card */
 .side-col {
   display: flex;
   flex-direction: column;
@@ -1034,7 +1015,6 @@ footer .credit::after {
   background: #ffffff;
   pointer-events: none;
 }
-/* Preloaded reaction videos, stacked above the default loop. */
 .video-card video.layer {
   position: absolute;
   inset: 0;
@@ -1101,7 +1081,6 @@ footer .credit::after {
   box-shadow: 0 16px 34px rgba(11, 27, 51, 0.45);
 }
 
-/* Responsive and reduced motion */
 @media (max-width: 800px) {
   main {
     grid-template-columns: 1fr;
