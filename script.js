@@ -1,6 +1,3 @@
-/* ==================================================================
-   Smoke intro
-================================================================== */
 (function smokeIntro() {
   const root = document.documentElement;
   const canvas = document.getElementById("smokeCanvas");
@@ -12,7 +9,6 @@
     finished = true;
     root.classList.remove("intro-on");
   }
-  /* Skip the intro when reduced motion is on, or for bots (no intro-on class). */
   if (
     !canvas ||
     !canvas.getContext ||
@@ -101,7 +97,6 @@
     });
   }
 
-  /* Intro voice and mute button */
   const audio = new Audio("Laugh.mp3");
   audio.preload = "auto";
   const ON =
@@ -126,7 +121,6 @@
   const LAMP_SVG =
     '<img class="lamp" src="lamp.png" alt="" width="260" draggable="false">';
 
-  /* Shown when the browser blocks autoplay; a click provides the user gesture. */
   function showLamp(onGo) {
     const gate = document.createElement("div");
     gate.className = "intro-gate";
@@ -153,7 +147,6 @@
     if (soundBtn) soundBtn.remove();
   }
 
-  /* Lightning synced to the voice (t = seconds into Laugh.mp3) */
   const LIGHTNING = [
     { t: 2.68, power: 0.45 },
     { t: 2.85, power: 0.55 },
@@ -163,7 +156,6 @@
   ];
   const bolts = [];
 
-  /* Recursive midpoint displacement produces the jagged bolt path. */
   function jag(x1, y1, x2, y2, d, out) {
     if (d < 5) {
       out.push([x2, y2]);
@@ -227,7 +219,6 @@
     }
   }
 
-  /* Smoke animation loop */
   let start = null,
     last = 0,
     acc = 0,
@@ -248,7 +239,6 @@
     prevFront = front;
     const trail = soft * 1.1;
 
-    /* Use the audio clock when available so lightning stays in sync. */
     const clock =
       audio.readyState > 1 && !audio.paused && !audio.error
         ? audio.currentTime
@@ -331,7 +321,6 @@
     introStarted = true;
     addSoundButton();
     requestAnimationFrame(frame);
-    /* Failsafe: always remove the intro even if the animation stalls. */
     setTimeout(() => {
       finish();
       if (canvas.isConnected) canvas.remove();
@@ -339,23 +328,19 @@
     }, DURATION + 5000);
   }
 
-  /* Phones and tablets have a coarse pointer. */
   const isPhone = window.matchMedia("(pointer: coarse)").matches;
 
   function begin() {
-    /* Phones: always ask for a tap, so the sound is guaranteed to play. */
     if (isPhone) {
       showLamp(() => {
-        /* Start the smoke only once the audio really plays, so lightning stays in sync. */
         audio.addEventListener("playing", startIntro, { once: true });
-        setTimeout(startIntro, 2500); // never wait forever
+        setTimeout(startIntro, 2500);
         const p = audio.play();
         if (p && p.catch) p.catch(startIntro);
       });
       return;
     }
 
-    /* Laptop: try autoplay first, fall back to the lamp if blocked. */
     let p;
     try {
       p = audio.play();
@@ -381,16 +366,12 @@
     }
   }
 
-  /* Wait for fonts, but never longer than 900 ms. */
   Promise.race([
     (document.fonts && document.fonts.ready) || Promise.resolve(),
     new Promise((r) => setTimeout(r, 900)),
   ]).then(begin);
 })();
 
-/* ==================================================================
-   Reaction video card
-================================================================== */
 const reactionVideoState = (function () {
   const video = document.getElementById("reactionVideo");
   const card = document.getElementById("videoCard");
@@ -399,26 +380,24 @@ const reactionVideoState = (function () {
 
   const VIDEO_FOLDER = "videos/";
   const DEFAULT_SRC = VIDEO_FOLDER + "Default.mp4";
-  let stage = "default"; // "default" | "reaction"
+  let stage = "default";
 
-  /* Reaction clips per tier (minimum GPA in comments) */
   const REACTIONS = {
-    great: ["Reaction1.mp4", "Reaction1.2.mp4"], // 3.8+
-    vgood: ["Reaction2.mp4"], // 3.5+
-    good: ["Reaction3.mp4"], // 3.0+
-    avg: ["Reaction4.mp4"], // 2.5+
-    okay: ["Reaction5.mp4", "Reaction5.1.mp4"], // 2.0+
-    low: ["Last.mp4"], // below 2.0
+    great: ["Reaction1.mp4", "Reaction1.2.mp4"],
+    vgood: ["Reaction2.mp4"],
+    good: ["Reaction3.mp4"],
+    avg: ["Reaction4.mp4"],
+    okay: ["Reaction5.mp4", "Reaction5.1.mp4"],
+    low: ["Last.mp4"],
   };
 
-  /* Sound toggle */
   const soundBtn = document.getElementById("videoSoundBtn");
   const ICON_ON =
     '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M16.5 8.5a5 5 0 0 1 0 7"/></svg>';
   const ICON_OFF =
     '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M17 9l5 6M22 9l-5 6"/></svg>';
   let soundOn = true;
-  let current = null; // reaction layer currently shown (null when default is showing)
+  let current = null;
   function renderSound() {
     if (soundBtn) soundBtn.innerHTML = soundOn ? ICON_ON : ICON_OFF;
   }
@@ -426,18 +405,15 @@ const reactionVideoState = (function () {
   if (soundBtn) {
     soundBtn.addEventListener("click", () => {
       soundOn = !soundOn;
-      video.muted = true; // the default loop is always muted
+      video.muted = true;
       if (current) current.muted = !soundOn;
       renderSound();
     });
   }
 
-  /* Desktop: one preloaded layer per clip (instant playback, unchanged behaviour).
-     Phone: ONE shared layer plus background prefetch, because phones cannot
-     buffer or decode many <video> elements at once. */
   const IS_PHONE = window.matchMedia("(pointer: coarse)").matches;
   const layers = {};
-  const cache = {}; // phone only: file -> blob URL
+  const cache = {};
   let sharedLayer = null;
   let stallTimer = null;
 
@@ -466,11 +442,9 @@ const reactionVideoState = (function () {
   if (IS_PHONE) {
     sharedLayer = makeLayer();
 
-    /* Download the clips one by one in the background, then play them from memory.
-       If a clip is not ready yet (or fetch fails), the direct URL is used instead. */
     const prefetchAll = function () {
       const c = navigator.connection;
-      if (c && c.saveData) return; // respect Data Saver
+      if (c && c.saveData) return;
       let i = 0;
       (function next() {
         if (i >= allFiles.length) return;
@@ -532,7 +506,6 @@ const reactionVideoState = (function () {
       v.currentTime = 0;
     }
 
-    /* Reveal the layer only once it is playing to avoid a blank frame. */
     v.addEventListener(
       "playing",
       () => {
@@ -545,7 +518,6 @@ const reactionVideoState = (function () {
       v.play().catch(() => {});
     });
 
-    /* Phone only: if it has not started within 6 s, fall back to the default loop. */
     if (IS_PHONE) {
       clearTimeout(stallTimer);
       stallTimer = setTimeout(() => {
@@ -554,7 +526,6 @@ const reactionVideoState = (function () {
     }
   }
 
-  /* Phone only: keep the default loop alive (Low Power Mode, tab switches, etc.) */
   if (IS_PHONE) {
     video.setAttribute("playsinline", "");
     video.setAttribute("webkit-playsinline", "");
@@ -570,7 +541,6 @@ const reactionVideoState = (function () {
     );
   }
 
-  /* Drag support on small screens */
   const MOBILE_QUERY = window.matchMedia("(max-width: 800px)");
   let dragEnabled = false;
   let dragging = false;
@@ -665,9 +635,6 @@ const reactionVideoState = (function () {
   return { playTier, goToDefault };
 })();
 
-/* ==================================================================
-   GPA calculator
-================================================================== */
 const GRADES = [
   { label: "A+  (4.00)", value: 4.0 },
   { label: "A  (4.00)", value: 4.0 },
@@ -717,7 +684,6 @@ document.querySelectorAll(".tilt-card").forEach((card) => {
   });
 });
 
-/* Tab switching */
 const modeSwitch = document.getElementById("modeSwitch");
 const tabBtns = document.querySelectorAll(".mode-switch button");
 const pill = document.getElementById("switchPill");
@@ -725,7 +691,19 @@ const panelsWrap = document.querySelector(".panels-wrap");
 let activeIndex = 0;
 let switching = false;
 
-/* Elements of a card that take part in the enter/exit animation, in visual order. */
+modeSwitch.setAttribute("role", "tablist");
+tabBtns.forEach((b) => {
+  b.setAttribute("role", "tab");
+  b.setAttribute("aria-controls", "panel-" + b.dataset.tab);
+  b.setAttribute(
+    "aria-selected",
+    b.classList.contains("active") ? "true" : "false",
+  );
+});
+document
+  .querySelectorAll(".panel")
+  .forEach((p) => p.setAttribute("role", "tabpanel"));
+
 function getAnimEls(card) {
   const kids = Array.from(card.children);
   const rowsBox = kids.find(
@@ -742,7 +720,6 @@ const EXIT_DUR = 320,
   ENTER_DUR = 480,
   ENTER_STAGGER = 55;
 
-/* Returns the total animation time in ms. */
 function animateOut(card) {
   const els = getAnimEls(card);
   els.forEach((el, i) => {
@@ -752,7 +729,6 @@ function animateOut(card) {
   return els.length ? (els.length - 1) * EXIT_STAGGER + EXIT_DUR : 0;
 }
 
-/* Returns the total animation time in ms and clears inline styles afterwards. */
 function animateIn(card) {
   const els = getAnimEls(card);
   els.forEach((el, i) => {
@@ -776,14 +752,21 @@ tabBtns.forEach((btn, i) => {
     if (i === activeIndex || switching) return;
     switching = true;
     modeSwitch.classList.add("is-switching");
+    document
+      .querySelectorAll(".input-card")
+      .forEach((c) => c.classList.remove("shake"));
 
-    tabBtns.forEach((b) => b.classList.remove("active"));
+    tabBtns.forEach((b) => {
+      b.classList.remove("active");
+      b.setAttribute("aria-selected", "false");
+    });
     btn.classList.add("active");
+    btn.setAttribute("aria-selected", "true");
     pill.style.transform = `translateX(${i * 100}%)`;
     hideResult();
 
     panelsWrap.classList.remove("sweeping");
-    void panelsWrap.offsetWidth; // force reflow to restart the animation
+    void panelsWrap.offsetWidth;
     panelsWrap.classList.add("sweeping");
     setTimeout(() => panelsWrap.classList.remove("sweeping"), 750);
 
@@ -807,7 +790,6 @@ tabBtns.forEach((btn, i) => {
   });
 });
 
-/* Course and semester rows */
 function renderQuestDots(containerId, labelId, count, noun) {
   const container = document.getElementById(containerId);
   container.innerHTML = "";
@@ -821,7 +803,9 @@ function renderQuestDots(containerId, labelId, count, noun) {
 }
 
 const subjectRows = document.getElementById("subjectRows");
+const semRows = document.getElementById("semRows");
 let subjectCount = 0;
+let semCount = 0;
 
 function addSubjectRow() {
   const row = document.createElement("div");
@@ -848,24 +832,22 @@ function addSubjectRow() {
   subjectRows.appendChild(row);
   subjectCount++;
   renderQuestDots("questDotsSgpa", "questLabelSgpa", subjectCount, "course");
+  return row;
 }
 document
   .getElementById("addSubjectBtn")
   .addEventListener("click", addSubjectRow);
-for (let i = 0; i < 4; i++) addSubjectRow();
-
-const semRows = document.getElementById("semRows");
-let semCount = 0;
 
 function addSemRow(defaultName) {
   const row = document.createElement("div");
   row.className = "sem-row";
   row.innerHTML = `
-    <input type="text" placeholder="e.g. Semester 1" class="sem-name" value="${defaultName || ""}" aria-label="Semester name">
+    <input type="text" placeholder="e.g. Semester 1" class="sem-name" aria-label="Semester name">
     <input type="number" min="0" max="4" step="0.01" placeholder="3.50" class="sem-sgpa" aria-label="Semester SGPA">
     <input type="number" min="0" step="0.5" placeholder="18" class="sem-credit" aria-label="Semester credit hours">
     <button class="remove-btn" title="Vanish" aria-label="Remove semester">&#10005;</button>
   `;
+  row.querySelector(".sem-name").value = defaultName || "";
   row.querySelector(".remove-btn").addEventListener("click", () => {
     row.classList.add("row-leave");
     setTimeout(() => {
@@ -877,35 +859,64 @@ function addSemRow(defaultName) {
   semRows.appendChild(row);
   semCount++;
   renderQuestDots("questDotsCgpa", "questLabelCgpa", semCount, "semester");
+  return row;
 }
 document
   .getElementById("addSemBtn")
   .addEventListener("click", () => addSemRow());
+
+for (let i = 0; i < 4; i++) addSubjectRow();
 for (let i = 1; i <= 2; i++) addSemRow("Semester " + i);
 
-/* Calculation: SGPA is credit-weighted grade points; CGPA is credit-weighted SGPA. */
+const msgSgpa = document.createElement("p");
+msgSgpa.className = "form-msg";
+msgSgpa.setAttribute("role", "alert");
+document.getElementById("calcSgpaBtn").before(msgSgpa);
+
+const msgCgpa = document.createElement("p");
+msgCgpa.className = "form-msg";
+msgCgpa.setAttribute("role", "alert");
+document.getElementById("calcCgpaBtn").before(msgCgpa);
+
+subjectRows.addEventListener("input", () => (msgSgpa.textContent = ""));
+semRows.addEventListener("input", () => (msgCgpa.textContent = ""));
+
 document.getElementById("calcSgpaBtn").addEventListener("click", () => {
   let points = 0,
-    credits = 0;
+    credits = 0,
+    skipped = 0;
   subjectRows.querySelectorAll(".subject-row").forEach((row) => {
-    const credit = parseFloat(row.querySelector(".subj-credit").value);
+    const raw = row.querySelector(".subj-credit").value.trim();
+    const name = row.querySelector(".subj-name").value.trim();
+    const credit = parseFloat(raw);
     const grade = parseFloat(row.querySelector(".subj-grade").value);
     if (!isNaN(credit) && credit > 0) {
       points += credit * grade;
       credits += credit;
+    } else if (raw !== "" || name !== "") {
+      skipped++;
     }
   });
-  if (!credits) return shakeCard("panel-sgpa");
+  if (!credits) {
+    msgSgpa.textContent =
+      "Enter credit hours (above 0) for at least one course.";
+    return shakeCard("panel-sgpa");
+  }
+  msgSgpa.textContent = skipped
+    ? skipped + " row(s) without valid credits were ignored."
+    : "";
   showResult(points / credits, "Your SGPA");
 });
 
 document.getElementById("calcCgpaBtn").addEventListener("click", () => {
   let points = 0,
-    credits = 0;
+    credits = 0,
+    skipped = 0;
   semRows.querySelectorAll(".sem-row").forEach((row) => {
-    const sgpa = parseFloat(row.querySelector(".sem-sgpa").value);
-    const credit = parseFloat(row.querySelector(".sem-credit").value);
-    /* SGPA must be between 0 and 4, otherwise the row is ignored. */
+    const rawS = row.querySelector(".sem-sgpa").value.trim();
+    const rawC = row.querySelector(".sem-credit").value.trim();
+    const sgpa = parseFloat(rawS);
+    const credit = parseFloat(rawC);
     if (
       !isNaN(sgpa) &&
       sgpa >= 0 &&
@@ -915,9 +926,18 @@ document.getElementById("calcCgpaBtn").addEventListener("click", () => {
     ) {
       points += sgpa * credit;
       credits += credit;
+    } else if (rawS !== "" || rawC !== "") {
+      skipped++;
     }
   });
-  if (!credits) return shakeCard("panel-cgpa");
+  if (!credits) {
+    msgCgpa.textContent = "Enter an SGPA between 0 and 4 and credits above 0.";
+    return shakeCard("panel-cgpa");
+  }
+  msgCgpa.textContent = skipped
+    ? skipped +
+      " row(s) with invalid values were ignored (SGPA must be 0 to 4)."
+    : "";
   showResult(points / credits, "Your CGPA");
 });
 
@@ -926,6 +946,8 @@ function shakeCard(panelId) {
   card.classList.remove("shake");
   void card.offsetWidth;
   card.classList.add("shake");
+  clearTimeout(card.shakeTimer);
+  card.shakeTimer = setTimeout(() => card.classList.remove("shake"), 500);
 }
 
 function hideResult() {
@@ -934,7 +956,6 @@ function hideResult() {
   document.getElementById("mascotWrap").classList.remove("idle-bounce");
 }
 
-/* Result messages, mascot faces and levels */
 const messages = {
   great: [
     "Exceptional. This is elite territory. Guard it with the same discipline that built it.",
@@ -942,29 +963,29 @@ const messages = {
     "Superb. You earned every point. Now defend this position without compromise.",
   ],
   vgood: [
-    "Strong, but not elite yet. Master your weakest course and close the final gap.",
-    "Good is not the goal. The top tier is close, so sharpen your discipline and push harder.",
-    "One relentless effort separates you from the top. Eliminate every weak spot.",
+    "Strong work. A little extra focus on your weakest course could move you into the top tier.",
+    "You are close to the top. Polish the courses that cost you points and the gap will close.",
+    "Very good result. Keep your routine steady and aim your effort at one weak spot at a time.",
   ],
   good: [
-    "Decent, but decent builds no legacy. Raise your standard and attack your weakest course.",
-    "You are capable of far more than this. Cut the distractions and work with real intensity.",
-    "Comfort is the enemy of progress. Set a harder target and pursue it daily.",
+    "A solid result. Pick one course to improve and watch the number rise.",
+    "Good foundation. A slightly harder target for next semester will push you further.",
+    "You are on the right track. Consistent revision will lift this higher.",
   ],
   avg: [
-    "Average is a choice, not a fate. Commit to focused daily study and outwork your past self.",
-    "This is not your ceiling. Tighten your routine, confront your weak courses, and do more.",
-    "Mediocrity ends where real effort begins. Revise daily and demand better results.",
+    "A fair base to build on. Steady daily study can lift this noticeably.",
+    "There is room to grow. Start with your weakest course and build a simple routine.",
+    "Not your ceiling. Small, regular effort adds up faster than you expect.",
   ],
   okay: [
-    "This falls short of your potential. Stop delaying, build a strict routine, and execute it.",
-    "Excuses will not raise this number, effort will. Confront your weakest subjects now.",
-    "Below your capability. Discipline, revision, and relentless effort can reverse this.",
+    "There is plenty of room to improve. A consistent routine and early help on tough courses can turn this around.",
+    "This can change. Focus on one subject at a time and ask for help early.",
+    "Recoverable with steady effort. Plan your revision and start with the biggest-credit courses.",
   ],
   low: [
-    "This result demands immediate action. Face the gaps, seek guidance, and rebuild with discipline.",
-    "A serious wake-up call. Take ownership, ask for help, and fight your way back daily.",
-    "Staying here is not an option. One course, one hour, one day at a time, without excuses.",
+    "A hard result, but it is recoverable. Talk to your instructors and rebuild one course at a time.",
+    "Do not give up on this one. Ask for guidance, fix the basics, and improve step by step.",
+    "This is a starting point, not a verdict. Seek support and take it one course at a time.",
   ],
 };
 const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
@@ -1036,7 +1057,6 @@ const TAGS = {
   low: "Needs improvement",
 };
 
-/* A single tier drives both the result card and the reaction video. */
 function tierFor(v) {
   if (v >= 3.8) return "great";
   if (v >= 3.5) return "vgood";
@@ -1046,7 +1066,6 @@ function tierFor(v) {
   return "low";
 }
 
-/* Result effects */
 function animateNumber(el, endValue, duration) {
   const start = performance.now();
   function tick(now) {
@@ -1086,7 +1105,6 @@ function spawnSparkles(field, tierKey) {
   }
 }
 
-/* Confetti for the top three tiers, rising dots for the rest. */
 function spawnParticles(container, tierKey) {
   const colors = ["#1587f0", "#40a6ff", "#7cc4ff", "#0b6fd0", "#ffc83d"];
   const shapes = ["confetti-sq", "confetti-circ", "confetti-tri"];
@@ -1194,3 +1212,64 @@ function showResult(value, label) {
     .getElementById("resultPanel")
     .scrollIntoView({ behavior: "smooth", block: "nearest" });
 }
+
+const planner = document.createElement("section");
+planner.className = "info planner";
+planner.id = "target-planner";
+planner.setAttribute("aria-labelledby", "planner-title");
+planner.innerHTML =
+  '<h2 id="planner-title">Target GPA planner</h2>' +
+  "<p>Find the SGPA you need next semester to reach your goal CGPA.</p>" +
+  '<div class="planner-grid">' +
+  '<label>Current CGPA<input type="number" id="plCgpa" min="0" max="4" step="0.01" placeholder="3.20"></label>' +
+  '<label>Credits completed<input type="number" id="plDone" min="0" step="0.5" placeholder="60"></label>' +
+  '<label>Target CGPA<input type="number" id="plTarget" min="0" max="4" step="0.01" placeholder="3.50"></label>' +
+  '<label>Credits next semester<input type="number" id="plNext" min="0" step="0.5" placeholder="15"></label>' +
+  "</div>" +
+  '<button class="calc-btn" id="plBtn" type="button"><span>Find my target SGPA</span></button>' +
+  '<p class="planner-out" id="plOut" role="status"></p>';
+document.getElementById("how-to-calculate").before(planner);
+
+const plBtn = document.getElementById("plBtn");
+plBtn.addEventListener("click", (e) => {
+  addRipple(plBtn, e);
+  const num = (id) => parseFloat(document.getElementById(id).value);
+  const cg = num("plCgpa");
+  const done = num("plDone");
+  const target = num("plTarget");
+  const next = num("plNext");
+  const out = document.getElementById("plOut");
+  if (
+    [cg, done, target, next].some(isNaN) ||
+    next <= 0 ||
+    done < 0 ||
+    cg < 0 ||
+    cg > 4 ||
+    target < 0 ||
+    target > 4
+  ) {
+    out.textContent =
+      "Fill all four fields with valid numbers (GPAs between 0 and 4, next-semester credits above 0).";
+    return;
+  }
+  const need = (target * (done + next) - cg * done) / next;
+  const best = (cg * done + 4 * next) / (done + next);
+  if (need > 4) {
+    out.textContent =
+      "Not reachable in one semester: even a perfect 4.00 SGPA gives a CGPA of " +
+      best.toFixed(2) +
+      ". Try a lower target or plan over more semesters.";
+  } else if (need <= 0) {
+    out.textContent =
+      "Your CGPA stays at or above " +
+      target.toFixed(2) +
+      " even with a 0.00 SGPA.";
+  } else {
+    out.textContent =
+      "You need an SGPA of at least " +
+      need.toFixed(2) +
+      " next semester to reach a CGPA of " +
+      target.toFixed(2) +
+      ".";
+  }
+});
