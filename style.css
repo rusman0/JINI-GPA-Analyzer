@@ -39,6 +39,16 @@ select:focus-visible {
 .smoke-canvas.fade-out {
   opacity: 0;
 }
+html.intro-on,
+html.intro-on body {
+  height: 100%;
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+.intro-gate {
+  touch-action: none;
+  overscroll-behavior: none;
+}
 
 .shell {
   position: relative;
